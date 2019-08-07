@@ -150,9 +150,9 @@ this.$bus.$emit('say', 'hello')
 |--src
 | |--components
 | | |--notice
-| | | |--Notice.vue #Notice 组件
+| | | |--Notice.vue Notice 组件
 | |--utils
-| | |--create.js #挂载方法
+| | |--create.js 挂载方法
 ```
 
 2.编写 Notice 组件
