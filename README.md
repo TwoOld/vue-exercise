@@ -6,7 +6,7 @@
 
 ```js
 // 父组件
-;<Child title="I am Child" />
+<Child title="I am Child" />
 
 // 子组件
 props: {
