@@ -1,24 +1,33 @@
 ### 组件间传值、通信
 
 ##### 父组件 => 子组件
+
 - props
-```
+
+```js
 // 父组件
-<Child title='I am Child'/>
+;<Child title="I am Child" />
 
 // 子组件
-props: { title: String }
+props: {
+  title: String
+}
 ```
+
 - refs
-```
+
+```js
 // 父组件
 <Child ref='child'/>
 ...
 this.$refs.child.xxx
 ```
+
 ##### 子组件 => 父组件
+
 - 自定义事件
-```
+
+```js
 // 父组件
 <Child @say='handleSay'/>
 ...
@@ -29,18 +38,24 @@ handleSay(val) {
 // 子组件
 this.$emit('say', 'hello')
 ```
+
 ##### 兄弟组件
-- 通过共同的祖辈组件搭桥，\$parent 或 $root
-```
+
+- 通过共同的祖辈组件搭桥，\$parent 或 \$root
+
+```js
 // 兄弟1
 this.$parent.$on('say', handleSay)
 
 // 兄弟2
 this.$parent.$emit('say', 'hello')
 ```
+
 ##### 祖先 => 后代
+
 - provide&inject 传值
-```
+
+```js
 // 祖先
 provide() {
   return { msg: 'hello world'}
@@ -51,8 +66,10 @@ provide() {
 ...
 inject: ['msg']
 ```
+
 - broadcast 通信
-```
+
+```js
 // 定义broadcast方法，指定派发事件名称和数据
 function broadcast(eventName, data) {
   this.$children.forEach(child => {
@@ -68,9 +85,12 @@ Vue.prototype.$broadcast = function (eventName, data) {
   broadcast.call(this, eventName, data)
 }
 ```
+
 ##### 后代 => 祖先
+
 - dispatch
-```
+
+```js
 // 定义dispatch方法，指定派发事件名称和数据
 function dispatch(eventName, data) {
   let parent = this.$parent
@@ -89,9 +109,12 @@ Vue.prototype.$dispatch = dispatch
 // App.vue
 this.$on('say', this.handleSay)
 ```
+
 ##### 任意组件间
-- 事件总线：创建一个Bus类负责事件派发、监听和回调管理（也可直接创建一个Vue实例，直接使用\$on和$emit）
-```
+
+- 事件总线：创建一个 Bus 类负责事件派发、监听和回调管理（也可直接创建一个 Vue 实例，直接使用\$on 和\$emit）
+
+```js
 // Bus：事件派发、监听和回调管理
 class Bus {
   constructor() {
@@ -102,7 +125,7 @@ class Bus {
     this.callbacks[name].push(fn)
   }
   $emit(name, args) {
-    if(this.callbacks[name]) {
+    if (this.callbacks[name]) {
       this.callbacks[name].forEach(cb => cb(args))
     }
   }
@@ -116,20 +139,25 @@ this.$bus.$on('say', this.handleSay)
 // 组件2
 this.$bus.$emit('say', 'hello')
 ```
-- [vuex](https://vuex.vuejs.org/zh/guide/)：创建唯一的全局数据管理者store，通过他管理数据并通知组件状态变更
 
-### Vue 全局挂载组件的通用方法：仿ElementUI notice
+- [vuex](https://vuex.vuejs.org/zh/guide/)：创建唯一的全局数据管理者 store，通过他管理数据并通知组件状态变更
+
+### Vue 全局挂载组件的通用方法：仿 ElementUI notice
+
 1.文件目录
-```
+
+```md
 |--src
-|    |--components
-|    |    |--notice
-|    |    |    |--Notice.vue #Notice组件
-|    |--utils
-|    |    |--create.js #挂载方法
+| |--components
+| | |--notice
+| | | |--Notice.vue #Notice 组件
+| |--utils
+| | |--create.js #挂载方法
 ```
-2.编写Notice组件
-```
+
+2.编写 Notice 组件
+
+```js
 <template>
     <div class="box" v-if="isShow">
         <h3>{{title}}</h3>
@@ -192,16 +220,18 @@ export default {
 }
 </style>
 ```
-3.编写create.js
-```
+
+3.编写 create.js
+
+```js
 import Vue from 'vue'
 
-export default function create(Component,props) {
+export default function create(Component, props) {
   // 创建实例
   const vm = new Vue({
     render(h) {
       // h为createElement，返回VNode虚拟Node
-      return h(Component,{props})
+      return h(Component, { props })
     }
   }).$mount()
 
@@ -218,15 +248,19 @@ export default function create(Component,props) {
   return comp
 }
 ```
-4.在main.js中将create挂载到Vue全局
-```
+
+4.在 main.js 中将 create 挂载到 Vue 全局
+
+```js
 // main.js
-import create from "@/utils/create"
+import create from '@/utils/create'
 
 Vue.prototype.$create = create
 ```
+
 5.调用
-```
+
+```js
 <template>
 ...
 </template>
@@ -248,10 +282,13 @@ export default {
 }
 ```
 
-### Vue 组件应用：仿Element UI中的Form组件 简单版
+### Vue 组件应用：仿 Element UI 中的 Form 组件 简单版
+
 ##### 调用
-- 由Form, FormItem 及实现双向绑定的Input组成
-```
+
+- 由 Form, FormItem 及实现双向绑定的 Input 组成
+
+```js
 <template>
     <div>
         <h3>Element表单</h3>
@@ -301,11 +338,14 @@ export default {
 };
 </script>
 ```
+
 ##### Input
+
 - 双向绑定：@input、:value
 - 派发校验事件
-- v-bind='[$attrs](https://cn.vuejs.org/v2/api/#vm-attrs)'，实现非props属性绑定
-```
+- v-bind='[\$attrs](https://cn.vuejs.org/v2/api/#vm-attrs)'，实现非 props 属性绑定
+
+```js
 <template>
     <div>
         <input :value="value" @input="onInput" v-bind="$attrs">
@@ -331,11 +371,14 @@ export default {
 }
 </script>
 ```
+
 ##### FormItem
-- 为Input预留插槽 slot
-- 能够展示label和校验信息
+
+- 为 Input 预留插槽 slot
+- 能够展示 label 和校验信息
 - 能够进行校验
-```
+
+```js
 <template>
     <div>
         <label v-if="label">{{label}}</label>
@@ -386,11 +429,14 @@ export default {
 }
 </script>
 ```
+
 ##### Form
-- 给FormItem预留插槽 slot
+
+- 给 FormItem 预留插槽 slot
 - 设置数据和校验规则
 - 全局校验
-```
+
+```js
 <template>
   <div>
     <slot></slot>
